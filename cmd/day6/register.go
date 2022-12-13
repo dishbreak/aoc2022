@@ -8,6 +8,12 @@ type CharRegister struct {
 
 type CharRegisterOption func(*CharRegister)
 
+func WithWindowSize(size int) CharRegisterOption {
+	return func(cr *CharRegister) {
+		cr.size = size
+	}
+}
+
 func NewCharRegister(opts ...CharRegisterOption) *CharRegister {
 	c := &CharRegister{
 		window: make([]byte, 0),

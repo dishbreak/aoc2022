@@ -27,3 +27,24 @@ func TestPart1(t *testing.T) {
 		})
 	}
 }
+
+func TestPart2(t *testing.T) {
+	type testCase struct {
+		input    string
+		expected int
+	}
+
+	testCases := []testCase{
+		{"mjqjpqmgbljsphdztnvjfqwrcgsmlb", 19},
+		{"bvwbjplbgvbhsrlpgdmjqwftvncz", 23},
+		{"nppdvjthqldpwncqszvftbrmjlhg", 23},
+		{"nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 29},
+		{"zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 26},
+	}
+
+	for i, tc := range testCases {
+		t.Run(fmt.Sprint("test case ", i), func(t *testing.T) {
+			assert.Equal(t, tc.expected, part2(tc.input))
+		})
+	}
+}
