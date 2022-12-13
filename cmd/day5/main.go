@@ -15,6 +15,7 @@ func main() {
 	}
 
 	fmt.Printf("Part 1: %s\n", part1(input))
+	fmt.Printf("Part 2: %s\n", part2(input))
 }
 
 func part1(input [][]string) string {
@@ -31,11 +32,34 @@ func part1(input [][]string) string {
 	return c.Topline()
 }
 
+func part2(input [][]string) string {
+	c := CrateLayoutFromStringSlice(input[0], WithCraneModelNumber(9001))
+
+	for _, line := range input[1] {
+		parts := strings.Fields(line)
+		count, _ := strconv.Atoi(parts[1])
+		src, _ := strconv.Atoi(parts[3])
+		dest, _ := strconv.Atoi(parts[5])
+		c.Move(count, src, dest)
+	}
+
+	return c.Topline()
+}
+
 type CrateLayout struct {
-	stacks [][]byte
+	stacks           [][]byte
+	multiCratePickup bool
 }
 
 func (c *CrateLayout) Move(count, srcIdx, destIdx int) {
+	if c.multiCratePickup {
+		srcLen := len(c.stacks[srcIdx])
+		crates := c.stacks[srcIdx][srcLen-count:]
+		c.stacks[srcIdx] = c.stacks[srcIdx][:srcLen-count]
+		c.stacks[destIdx] = append(c.stacks[destIdx], crates...)
+		return
+	}
+
 	for i := 0; i < count; i++ {
 		crate := c.pop(srcIdx)
 		c.push(destIdx, crate)
@@ -53,7 +77,20 @@ func (c *CrateLayout) push(idx int, crate byte) {
 	c.stacks[idx] = append(c.stacks[idx], crate)
 }
 
-func CrateLayoutFromStringSlice(input []string) *CrateLayout {
+type CrateLayoutOption func(*CrateLayout) error
+
+func WithCraneModelNumber(modelNum int) CrateLayoutOption {
+	multiCratePickup := false
+	if modelNum == 9001 {
+		multiCratePickup = true
+	}
+	return func(cl *CrateLayout) error {
+		cl.multiCratePickup = multiCratePickup
+		return nil
+	}
+}
+
+func CrateLayoutFromStringSlice(input []string, opts ...CrateLayoutOption) *CrateLayout {
 	lastLine := input[len(input)-1]
 	parts := strings.Fields(lastLine)
 	stackCt, _ := strconv.Atoi(parts[len(parts)-1])
@@ -76,6 +113,10 @@ func CrateLayoutFromStringSlice(input []string) *CrateLayout {
 			}
 			c.stacks[i] = append(c.stacks[i], n)
 		}
+	}
+
+	for _, opt := range opts {
+		opt(c)
 	}
 
 	return c
