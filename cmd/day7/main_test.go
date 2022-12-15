@@ -7,8 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPart1(t *testing.T) {
-	input := `$ cd /
+var input = `$ cd /
 $ ls
 dir a
 14848514 b.txt
@@ -32,5 +31,10 @@ $ ls
 5626152 d.ext
 7214296 k`
 
+func TestPart1(t *testing.T) {
 	assert.Equal(t, 95437, part1(strings.NewReader(input)))
+}
+
+func TestPart2(t *testing.T) {
+	assert.Equal(t, 24933642, part2(strings.NewReader(input)))
 }

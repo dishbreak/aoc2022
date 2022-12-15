@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strconv"
-	"strings"
 )
 
 func main() {
@@ -17,64 +15,48 @@ func main() {
 	defer f.Close()
 
 	fmt.Printf("Part 1: %d\n", part1(f))
+	f.Seek(0, io.SeekStart)
+	fmt.Printf("Part 2: %d\n", part2(f))
 }
 
 func part1(input io.Reader) int {
 	s := bufio.NewScanner(input)
-	hits := make(chan int)
-	go recurse(s, hits)
+
+	dirSizes := getDirSizes(s)
 
 	acc := 0
-	for v := range hits {
+	for _, v := range dirSizes {
+		if v > 100000 {
+			continue
+		}
 		acc += v
 	}
 
 	return acc
 }
 
-func recurse(s *bufio.Scanner, hits chan<- int) int {
-	size := 0
-	defer func() {
-		if size <= 100000 {
-			hits <- size
-		}
-	}()
+const totalSize int = 70000000
+const minUnused int = 30000000
 
-	isRoot := false
+func part2(input io.Reader) int {
+	s := bufio.NewScanner(input)
 
-	for s.Scan() {
-		l := s.Text()
-		p := strings.Fields(l)
-		switch p[0] {
-		case "$":
-			if p[1] == "ls" {
-				continue
-			}
+	sizes := getDirSizes(s)
 
-			if p[2] == "/" {
-				isRoot = true
-				continue
-			}
+	inUse := sizes[0]
 
-			if p[2] == ".." {
-				return size
-			}
+	unused := totalSize - inUse
+	target := minUnused - unused
 
-			size += recurse(s, hits)
-		case "dir":
+	for i, size := range sizes {
+		if i == 0 {
 			continue
-		default:
-			fsize, err := strconv.Atoi(p[0])
-			if err != nil {
-				panic(err)
-			}
-			size += fsize
+		}
+
+		if size < target {
+			return sizes[i-1]
 		}
 	}
 
-	if isRoot {
-		close(hits)
-	}
-
-	return size
+	return -1
 }
