@@ -35,6 +35,7 @@ type Monkey struct {
 	modulo    int64
 	inspected int64
 	worried   bool
+	damper    int64
 }
 
 type MonkeyOption func(*Monkey)
@@ -61,6 +62,8 @@ func (m *Monkey) Inspect() {
 		if !m.worried {
 			i = i / 3
 		}
+
+		i = i % m.damper
 
 		if i%m.modulo == 0 {
 			m.ifTrue.Catches(i)
