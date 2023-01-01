@@ -51,6 +51,10 @@ func (g *Grid) ReachZeroElevation(p image.Point) bool {
 
 func (g *Grid) ShortestPathTo(reached func(image.Point) bool) int {
 	//borrowed from https://observablehq.com/@jwolondon/advent-of-code-2022-day-12
+	// this approach is a breadth-first search starting from the endpoint
+	// it uses a memoization approach to avoid revisiting visited nodes
+	// note that this works because we don't need the path, just the step count.
+
 	dists := make(map[image.Point]int)
 
 	// define a frame type to help the BFS
