@@ -70,3 +70,43 @@ func (p *Packet) String() string {
 
 	return fmt.Sprintf("[%s]", strings.Join(pts, ","))
 }
+
+func (p *Packet) IsInt() bool {
+	return p.full && len(p.items) > 0
+}
+
+func (p *Packet) ToListPacket() *Packet {
+	return &Packet{
+		items: []*Packet{p},
+	}
+}
+
+func LessThan(left, right *Packet) bool {
+	leftInt, rightInt := left.IsInt(), right.IsInt()
+
+	if leftInt && rightInt {
+		return left.value < right.value
+	}
+
+	if leftInt {
+		left = left.ToListPacket()
+	}
+
+	if rightInt {
+		right = right.ToListPacket()
+	}
+
+	length := len(left.items)
+	if rLen := len(right.items); rLen > len(right.items) {
+		length = rLen
+	}
+
+	for i := 0; i < length; i++ {
+		if LessThan(left.items[i], right.items[i]) {
+			return true
+		}
+	}
+
+	return len(left.items) < len(right.items)
+
+}
