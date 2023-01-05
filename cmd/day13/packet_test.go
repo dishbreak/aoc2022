@@ -65,6 +65,7 @@ func TestLessThan(t *testing.T) {
 
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("test case %d", i), func(t *testing.T) {
+			_ = i
 			pktL, pktR := PacketFromString(tc.left), PacketFromString(tc.right)
 			assert.Equal(t, tc.result, LessThan(pktL, pktR))
 		})

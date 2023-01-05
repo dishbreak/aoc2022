@@ -72,7 +72,7 @@ func (p *Packet) String() string {
 }
 
 func (p *Packet) IsInt() bool {
-	return p.full && len(p.items) > 0
+	return p.full && len(p.items) == 0
 }
 
 func (p *Packet) ToListPacket() *Packet {
@@ -97,7 +97,7 @@ func LessThan(left, right *Packet) bool {
 	}
 
 	length := len(left.items)
-	if rLen := len(right.items); rLen > len(right.items) {
+	if rLen := len(right.items); rLen < len(left.items) {
 		length = rLen
 	}
 
