@@ -32,7 +32,8 @@ var input = []string{
 
 func TestParseCave(t *testing.T) {
 	c := parseCave(input)
-	assert.True(t, c[image.Pt(498, 5)])
-	assert.False(t, c[image.Pt(500, 5)])
-	assert.True(t, c[image.Pt(501, 9)])
+	assert.True(t, c.pts[image.Pt(498, 5)])
+	assert.False(t, c.pts[image.Pt(500, 5)])
+	assert.True(t, c.pts[image.Pt(501, 9)])
+	assert.Equal(t, 9, c.maxY)
 }
