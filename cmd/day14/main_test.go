@@ -37,3 +37,13 @@ func TestParseCave(t *testing.T) {
 	assert.True(t, c.pts[image.Pt(501, 9)])
 	assert.Equal(t, 9, c.maxY)
 }
+
+func TestPart1(t *testing.T) {
+	c := parseCave(input)
+	assert.Equal(t, 24, c.FillWithSand())
+}
+
+func TestPart2(t *testing.T) {
+	c := parseCave(input, WithInfiniteFloor)
+	assert.Equal(t, 93, c.FillWithSand())
+}
