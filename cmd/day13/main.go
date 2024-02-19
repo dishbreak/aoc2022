@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -18,6 +19,7 @@ func main() {
 
 	fmt.Printf("Part 1: %d\n", part1(f))
 	f.Seek(0, 0)
+	fmt.Printf("Part 2: %d\n", part2(f))
 }
 
 func part1(r io.Reader) int {
@@ -139,4 +141,72 @@ func inOrder(a, b interface{}) int {
 
 	return Continue // unclear, keep checking
 
+}
+
+func isDivider(pkt interface{}, divisor int) bool {
+	outerSlc, ok := pkt.([]interface{})
+	if !ok {
+		return false
+	}
+	if len(outerSlc) != 1 {
+		return false
+	}
+
+	innerSlc, ok := outerSlc[0].([]interface{})
+	if !ok {
+		return false
+	}
+	if len(innerSlc) != 1 {
+		return false
+	}
+
+	innerSlc, ok = innerSlc[0].([]interface{})
+	if !ok {
+		return false
+	}
+	if len(innerSlc) != 1 {
+		return false
+	}
+
+	innerVal, ok := innerSlc[0].(int)
+	if !ok {
+		return false
+	}
+
+	return innerVal == divisor
+}
+
+func part2(r io.Reader) int {
+	var pkts []interface{}
+	s := bufio.NewScanner(r)
+
+	for s.Scan() {
+		if s.Text() == "" {
+			continue
+		}
+		pkts = append(pkts, parse(makeScanner(s.Text())))
+	}
+
+	for _, div := range []int{2, 6} {
+		pkts = append(pkts, parse(makeScanner(fmt.Sprintf("[[%d]]", div))))
+	}
+
+	sort.Slice(pkts, func(i, j int) bool {
+		return inOrder(pkts[i], pkts[j]) == InOrder
+	})
+
+	divTgt := 2
+
+	result := 1
+	for i, pkt := range pkts {
+		if isDivider(pkt, divTgt) {
+			result *= (i + 1)
+			if divTgt == 6 {
+				break
+			}
+			divTgt = 6
+		}
+	}
+
+	return result
 }

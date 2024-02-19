@@ -143,3 +143,73 @@ func load(s string) interface{} {
 
 	return parse(i)
 }
+
+func TestIsDivisor(t *testing.T) {
+	type testCase struct {
+		input  string
+		result bool
+	}
+
+	testCases := []testCase{
+		{
+			input:  "[[2]]",
+			result: true,
+		},
+		{
+			input:  "7",
+			result: false,
+		},
+		{
+			input:  "[5,6]",
+			result: false,
+		},
+		{
+			input:  "[[2,4]]",
+			result: false,
+		},
+		{
+			input:  "[[[3]]]",
+			result: false,
+		},
+		{
+			input:  "[[3]]",
+			result: false,
+		},
+	}
+
+	for i, tc := range testCases {
+		t.Run(fmt.Sprint("test case", i), func(t *testing.T) {
+			pkt := load(tc.input)
+			assert.Equal(t, tc.result, isDivider(pkt, 2))
+		})
+	}
+}
+
+func TestPart2(t *testing.T) {
+	input := `[1,1,3,1,1]
+[1,1,5,1,1]
+
+[[1],[2,3,4]]
+[[1],4]
+
+[9]
+[[8,7,6]]
+
+[[4,4],4,4]
+[[4,4],4,4,4]
+
+[7,7,7,7]
+[7,7,7]
+
+[]
+[3]
+
+[[[]]]
+[[]]
+
+[1,[2,[3,[4,[5,6,7]]]],8,9]
+[1,[2,[3,[4,[5,6,0]]]],8,9]
+`
+	r := strings.NewReader(input)
+	assert.Equal(t, 140, part2(r))
+}
