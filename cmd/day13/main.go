@@ -2,8 +2,54 @@ package main
 
 import (
 	"bufio"
+	"fmt"
+	"io"
+	"os"
 	"strconv"
+	"strings"
 )
+
+func main() {
+	f, err := os.Open("inputs/day13.txt")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	fmt.Printf("Part 1: %d\n", part1(f))
+	f.Seek(0, 0)
+}
+
+func part1(r io.Reader) int {
+	s := bufio.NewScanner(r)
+	var lines [2]string
+	var i int
+	var acc int
+	idx := 1
+
+	for s.Scan() {
+		lines[i] = s.Text()
+		i++
+
+		if i == 2 {
+			i = 0
+			left, right := parse(makeScanner(lines[0])), parse(makeScanner(lines[1]))
+			if inOrder(left, right) == InOrder {
+				acc += idx
+			}
+			idx++
+			s.Scan() // grab the newline
+		}
+	}
+	return acc
+}
+
+func makeScanner(s string) *bufio.Scanner {
+	r := strings.NewReader(s)
+	i := bufio.NewScanner(r)
+	i.Split(bufio.ScanRunes)
+	return i
+}
 
 func parse(i *bufio.Scanner) (p []interface{}) {
 	var buf int
