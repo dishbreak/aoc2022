@@ -2,25 +2,26 @@ package main
 
 import "image"
 
-type Rope struct {
+type KnotLink struct {
 	head, tail image.Point
 	tailSpots  map[image.Point]bool
 }
 
-func (r *Rope) Move(v image.Point) {
+func (r *KnotLink) Move(v image.Point) image.Point {
 	r.head = r.head.Add(v)
-	r.moveTail(v)
+	n := r.moveTail(v)
 	r.tailSpots[r.tail] = true
+	return n
 }
 
-func (r *Rope) moveTail(v image.Point) {
+func (r *KnotLink) moveTail(v image.Point) image.Point {
 	if touching(r.head, r.tail) {
-		return
+		return image.Point{}
 	}
 
 	if colinear(r.head, r.tail) {
 		r.tail = r.tail.Add(v)
-		return
+		return v
 	}
 
 	d := r.head.Sub(r.tail)
@@ -30,9 +31,11 @@ func (r *Rope) moveTail(v image.Point) {
 		d.Y = d.Y / aY
 	}
 	r.tail = r.tail.Add(d)
+
+	return d
 }
 
-func (r *Rope) TailHits() int {
+func (r *KnotLink) TailHits() int {
 	return len(r.tailSpots)
 }
 
@@ -55,4 +58,33 @@ func colinear(one, other image.Point) bool {
 		return true
 	}
 	return false
+}
+
+type Rope struct {
+	knots [10]*KnotLink
+}
+
+func NewRope() *Rope {
+	r := &Rope{}
+
+	for i := range r.knots {
+		r.knots[i] = &KnotLink{
+			tailSpots: make(map[image.Point]bool),
+		}
+	}
+
+	return r
+}
+
+func (r *Rope) Move(v image.Point) {
+	for _, k := range r.knots {
+		v = k.Move(v)
+		if v == image.Pt(0, 0) {
+			return
+		}
+	}
+}
+
+func (r *Rope) TailHits() int {
+	return len(r.knots[9].tailSpots)
 }

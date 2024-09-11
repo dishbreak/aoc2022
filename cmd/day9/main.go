@@ -42,9 +42,22 @@ func instructionFromString(line string) Instruction {
 }
 
 func part1(input []string) int {
-	r := &Rope{
+	r := &KnotLink{
 		tailSpots: make(map[image.Point]bool),
 	}
+
+	for _, line := range input {
+		inst := instructionFromString(line)
+		for i := 0; i < inst.Count; i++ {
+			r.Move(inst.Direction)
+		}
+	}
+
+	return r.TailHits()
+}
+
+func part2(input []string) int {
+	r := NewRope()
 
 	for _, line := range input {
 		inst := instructionFromString(line)
